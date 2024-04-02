@@ -4,15 +4,16 @@ import (
 	"AuthService/internal/repository/models"
 	"fmt"
 	"github.com/golang-jwt/jwt/v5"
+	"os"
 	"time"
 )
 
-var Secret string = "eertegftbhrdsger"
-
 func GenerateTokenPair(user models.User) (at string, rt string, err error) {
+	Secret := os.Getenv("SECRET_KEY")
+
 	aToken := jwt.NewWithClaims(jwt.SigningMethodHS512, jwt.MapClaims{
 		"sub": user.Id,
-		"exp": time.Now().Add(time.Minute * 30).Unix(),
+		"exp": time.Now().Add(15 * time.Minute).Unix(),
 	})
 
 	accessToken, err := aToken.SignedString([]byte(Secret))
@@ -22,7 +23,7 @@ func GenerateTokenPair(user models.User) (at string, rt string, err error) {
 
 	rToken := jwt.NewWithClaims(jwt.SigningMethodHS512, jwt.MapClaims{
 		"sub": user.Id,
-		"exp": time.Now().Add(time.Hour * 24 * 30),
+		"exp": time.Now().Add(24 * 30 * 24 * time.Hour).Unix(),
 	})
 
 	refreshToken, err := rToken.SignedString([]byte(Secret))
